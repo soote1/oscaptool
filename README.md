@@ -4,9 +4,8 @@ Table of Contents
 * [What is oscaptool?](#what-is-oscaptool)
 * [Design](#design)
 * [Installation Instructions](#installation-instructions)
-* [Running oscaptool](#running-bettingtool)
+* [Running oscaptool](#running-oscaptool)
 * [Testing](#testing)
-* [Directory Structure](#directory-structure)
 * [Licensing](#licensing)
 
 ---

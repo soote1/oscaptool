@@ -6,7 +6,6 @@ Table of Contents
 * [Installation Instructions](#installation-instructions)
 * [Running oscaptool](#running-bettingtool)
 * [Testing](#testing)
-* [Community and Contributing](#community-and-contributing)
 * [Directory Structure](#directory-structure)
 * [Licensing](#licensing)
 
@@ -52,10 +51,10 @@ Once the virtualenv is running, you will be able to find the oscaptool command
 Running oscaptool
 ------
 oscaptool depends on two configuration files:
-* logging.conf: contains settings for the logging module.
-* config.json: contains settings for building the args parser and action manager objects.
+* **logging.conf**: contains settings for the logging module.
+* **config.json**: contains settings for building the args parser and action manager objects.
 
-You need to verify that both files are filled propperly before running the app.
+Make sure that both files are filled propperly before running the application.
 
 There are multiple ways to run the oscaptool command depending on the feature you want to use. 
 Before start using the cli tool, run the following command to identify the available options:

@@ -24,6 +24,16 @@ COMMAND = 'command'
 CMD_STDOUT = 'cmd_stdout'
 STDOUT_INPUT = 'stdout_input'
 
+class ScanStats:
+    def __init__(self, pass_count, fail_count, na_count, total):
+        self.pass_count = pass_count
+        self.fail_count = fail_count
+        self.na_count = na_count
+        self.total = total
+    
+    def __repr__(self):
+        return f'total: {self.total} pass: {self.pass_count} fail: {self.fail_count} notapplicable: {self.na_count}'
+
 class CreateScanId(Action):
     """A class to create the scan id."""
     def __init__(self, config):
@@ -87,10 +97,11 @@ class CompareScanResults(Action):
         a dictionary including the counts for each word.
         """
         self.logger.debug('Creating stats object for scan result')
-        pass_items = len(re.findall(PASS_SCAN_RESULT, scan_result_str))
-        fail_items = len(re.findall(FAIL_SCAN_RESULT, scan_result_str))
-        na_items = len(re.findall(NA_SCAN_RESULT, scan_result_str))
-        return {PASS_SCAN_RESULT:pass_items, FAIL_SCAN_RESULT:fail_items, NA_SCAN_RESULT:na_items}
+        pass_count = len(re.findall(PASS_SCAN_RESULT, scan_result_str))
+        fail_count = len(re.findall(FAIL_SCAN_RESULT, scan_result_str))
+        na_count = len(re.findall(NA_SCAN_RESULT, scan_result_str))
+        total_count = pass_count + fail_count + na_count
+        return ScanStats(pass_count, fail_count, na_count, total_count)
 
     def diff_stats(self, stats1, stats2):
         """Calculates the absolute difference between each stats object 
@@ -104,10 +115,11 @@ class CompareScanResults(Action):
         a dictionary including the diff between stats.
         """
         self.logger.debug('Creating diff object using scan result objects')
-        pass_diff = abs(stats1[PASS_SCAN_RESULT]-stats2[PASS_SCAN_RESULT])
-        fail_diff = abs(stats1[FAIL_SCAN_RESULT]-stats2[FAIL_SCAN_RESULT])
-        na_diff = abs(stats1[NA_SCAN_RESULT]-stats2[NA_SCAN_RESULT])
-        return {PASS_SCAN_RESULT:pass_diff, FAIL_SCAN_RESULT:fail_diff, NA_SCAN_RESULT:na_diff}
+        pass_diff = abs(stats1.pass_count-stats2.pass_count)
+        fail_diff = abs(stats1.fail_count-stats2.fail_count)
+        na_diff = abs(stats1.na_count-stats2.na_count)
+        total_diff = pass_diff + fail_diff + na_diff
+        return ScanStats(pass_diff, fail_diff, na_diff, total_diff)
 
     def create_output_str(self, stats1, stats2, diff):
         """Creates a string representation of each stats (stats1, stats2, diff).
@@ -121,9 +133,9 @@ class CompareScanResults(Action):
         a string representing the data on each input.
         """
         self.logger.debug('Building string representation for stats')
-        scan_1_stats_str = f"Scan 1 - {PASS_SCAN_RESULT}: {stats1[PASS_SCAN_RESULT]} {FAIL_SCAN_RESULT}: {stats1[FAIL_SCAN_RESULT]} {NA_SCAN_RESULT}: {stats1[NA_SCAN_RESULT]}"
-        scan_2_stats_str = f"Scan 2 - {PASS_SCAN_RESULT}: {stats2[PASS_SCAN_RESULT]} {FAIL_SCAN_RESULT}: {stats2[FAIL_SCAN_RESULT]} {NA_SCAN_RESULT}: {stats2[NA_SCAN_RESULT]}"
-        diff_str  = f"Diff - {PASS_SCAN_RESULT}: {diff[PASS_SCAN_RESULT]} {FAIL_SCAN_RESULT}: {diff[FAIL_SCAN_RESULT]} {NA_SCAN_RESULT}: {diff[NA_SCAN_RESULT]}"
+        scan_1_stats_str = f"Scan 1 - {stats1}"
+        scan_2_stats_str = f"Scan 2 - {stats2}"
+        diff_str  = f"Diff - {diff}"
         return f'{scan_1_stats_str}\n{scan_2_stats_str}\n{diff_str}'
 
 class GetScanResult(Action):

@@ -5,7 +5,7 @@ import logging
 import logging.config
 
 from oscaptool.sample.util import ArgsParser
-from oscaptool.sample.actionmanager.manager import ActionManager, WorkflowMetadata
+from actionmanager.manager import ActionManager, WorkflowMetadata
 
 ARGPARSER = 'argparser'
 ACTIONMANAGER = 'actionmanager'

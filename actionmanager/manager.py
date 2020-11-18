@@ -1,5 +1,5 @@
-from oscaptool.sample.actionmanager.actions import ActionError
-from oscaptool.sample.actionmanager.helpers import ActionFactory
+from actionmanager.actions import ActionError
+from actionmanager.helpers import ActionFactory
 
 class ActionManagerError(Exception):
     """Raised when the action manager presents an error."""

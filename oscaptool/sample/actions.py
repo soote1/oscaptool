@@ -4,7 +4,7 @@ import logging
 import subprocess
 
 from oscaptool.sample.util import FileHelper
-from oscaptool.sample.actionmanager.actions import Action, ActionError
+from actionmanager.actions import Action, ActionError
 
 SCAN_TYPE = 'scantype'
 SCAN_SUB_TYPE = 'scansubtype'

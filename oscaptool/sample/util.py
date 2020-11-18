@@ -2,6 +2,18 @@ import os
 import logging
 import argparse
 
+SUBPARSERS = 'subparsers'
+REQUIRED = 'required'
+ID = 'id'
+SUBPARSERS_CFGS = 'subparsers_cfgs'
+NAME = 'name'
+HELP = 'help'
+ARGS = 'args'
+TYPE = 'type'
+OPT = 'opt'
+ID2 = 'id2'
+WRITE_MODE = 'w'
+ 
 class ArgsParser:
     """A helper class to validate arguments."""
     def __init__(self, config):
@@ -13,8 +25,8 @@ class ArgsParser:
         """Create arg parser object."""
         self.logger.debug('Creating parser objects using config dictionary')
         self.parser = argparse.ArgumentParser()
-        if "subparsers" in config:
-            self.load_subparsers(config['subparsers'], self.parser)
+        if SUBPARSERS in config:
+            self.load_subparsers(config[SUBPARSERS], self.parser)
     
     def load_subparsers(self, subparsers_config, parent_parser):
         """Add subparsers to parent parser recursively.
@@ -25,23 +37,23 @@ class ArgsParser:
         """
         self.logger.debug('Loading subparsers recursively')
         # create subparsers
-        subparsers = parent_parser.add_subparsers(dest=subparsers_config['id'])
-        subparsers.required = subparsers_config['required']
-        for subparser_config in subparsers_config['subparsers_cfgs']:
-            subparser = subparsers.add_parser(subparser_config['name'], help=subparser_config['help'])
+        subparsers = parent_parser.add_subparsers(dest=subparsers_config[ID])
+        subparsers.required = subparsers_config[REQUIRED]
+        for subparser_config in subparsers_config[SUBPARSERS_CFGS]:
+            subparser = subparsers.add_parser(subparser_config[NAME], help=subparser_config[HELP])
 
             # load arguments for subparser
-            for arg in subparser_config['args']:
-                if arg['type'] == 'opt':
-                    arg_id = arg['id']
-                    arg_id2 = arg['id2']
+            for arg in subparser_config[ARGS]:
+                if arg[TYPE] == OPT:
+                    arg_id = arg[ID]
+                    arg_id2 = arg[ID2]
                     subparser.add_argument(arg_id, arg_id2)
                 else:
-                    arg_id = arg['id']
+                    arg_id = arg[ID]
                     subparser.add_argument(arg_id)
 
-            if 'subparsers' in subparser_config:
-                self.load_subparsers(subparser_config['subparsers'], subparser)
+            if SUBPARSERS in subparser_config:
+                self.load_subparsers(subparser_config[SUBPARSERS], subparser)
 
     def parse(self, arguments):
         """Parse a list of arguments and return a dictionary with the result.
@@ -68,7 +80,7 @@ class FileHelper:
         lines    -- a list of strings representing the content
         """
         os.makedirs(os.path.dirname(filename), exist_ok=True)
-        with open(filename, 'w') as file_writer:
+        with open(filename, WRITE_MODE) as file_writer:
             file_writer.writelines(lines)
 
     @staticmethod

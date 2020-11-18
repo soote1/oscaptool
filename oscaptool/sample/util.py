@@ -1,14 +1,17 @@
-import argparse
 import os
+import logging
+import argparse
 
 class ArgsParser:
     """A helper class to validate arguments."""
     def __init__(self, config):
         """Initialize instance with given config."""
+        self.logger = logging.getLogger()
         self.load_parsers(config)
 
     def load_parsers(self, config):
         """Create arg parser object."""
+        self.logger.debug('Creating parser objects using config dictionary')
         self.parser = argparse.ArgumentParser()
         if "subparsers" in config:
             self.load_subparsers(config['subparsers'], self.parser)
@@ -20,6 +23,7 @@ class ArgsParser:
         subparsers_config -- the configuration dict for the current subparser
         parent_parser     -- the parent object to add the parsers to.
         """
+        self.logger.debug('Loading subparsers recursively')
         # create subparsers
         subparsers = parent_parser.add_subparsers(dest=subparsers_config['id'])
         subparsers.required = subparsers_config['required']
@@ -48,6 +52,7 @@ class ArgsParser:
         Return value:\n
         a dictionary with the result of argparse.ArgumentParser.parse_args()
         """
+        self.logger.debug('Parsing arguments')
         args = self.parser.parse_args(arguments)
         return vars(args)
 

@@ -1,5 +1,6 @@
 import re
 import time
+import logging
 import subprocess
 
 from oscaptool.sample.util import FileHelper
@@ -10,6 +11,7 @@ class CreateScanId(Action):
     def __init__(self, config):
         """Initialize action with a given configuration dictionary."""
         self.config = config
+        self.logger = logging.getLogger()
 
     def execute(self, input_data):
         """Creates a unique scan id using the current timestamp, scan type
@@ -21,6 +23,7 @@ class CreateScanId(Action):
         Return value:\n
         a dictionary including the action's output and all previous inputs.\n
         """
+        self.logger.debug('Running CreateScanId action')
         current_timestamp = int(time.time())
         scan_type = input_data['scantype']
         scan_subtype = input_data['scansubtype']
@@ -33,6 +36,7 @@ class CompareScanResults(Action):
     def __init__(self, config):
         """Initialize action with a given configuration dictionary."""
         self.config = config
+        self.logger = logging.getLogger()
 
     def execute(self, input_data):
         """Calculates stats (total, pass, fail and notapplicable results)
@@ -45,7 +49,7 @@ class CompareScanResults(Action):
         Return value:\n
         a dictionary including the action's output and all previous inputs.
         """
-        print("CompareScanResults action")
+        self.logger.debug('Running CompareScanResults action')
         scan_stats_1 = self.get_scan_stats(input_data[self.config['scan_result_1_key_name']])
         scan_stats_2 = self.get_scan_stats(input_data[self.config['scan_result_2_key_name']])
         stats_comaparison = self.diff_stats(scan_stats_1, scan_stats_2)
@@ -64,6 +68,7 @@ class CompareScanResults(Action):
         Return value:\n
         a dictionary including the counts for each word.
         """
+        self.logger.debug('Creating stats object for scan result')
         pass_items = len(re.findall('pass', scan_result_str))
         fail_items = len(re.findall('fail', scan_result_str))
         na_items = len(re.findall('notapplicable', scan_result_str))
@@ -80,6 +85,7 @@ class CompareScanResults(Action):
         Return value:\n
         a dictionary including the diff between stats.
         """
+        self.logger.debug('Creating diff object using scan result objects')
         pass_diff = abs(stats1['pass']-stats2['pass'])
         fail_diff = abs(stats1['fail']-stats2['fail'])
         na_diff = abs(stats1['na']-stats2['na'])
@@ -96,6 +102,7 @@ class CompareScanResults(Action):
         Return value:\n
         a string representing the data on each input.
         """
+        self.logger.debug('Building string representation for stats')
         scan_1_stats_str = f"Scan 1 - pass: {stats1['pass']} fail: {stats1['fail']} na: {stats1['na']}"
         scan_2_stats_str = f"Scan 2 - pass: {stats2['pass']} fail: {stats2['fail']} na: {stats2['na']}"
         diff_str  = f"Diff - pass: {diff['pass_diff']} fail: {diff['fail_diff']} na: {diff['na_diff']}"
@@ -106,6 +113,7 @@ class GetScanResult(Action):
     def __init__(self, config):
         """Initialize the action with the given config."""
         self.config = config
+        self.logger = logging.getLogger()
 
     def execute(self, input_data):
         """Extracts the scan id from the input_data object and uses a helper class
@@ -118,7 +126,7 @@ class GetScanResult(Action):
         Return value:\n
         a dictionary including the action's output and all previous inputs.
         """
-        print("GetScanResult action")
+        self.logger.debug('Running GetScanResult action')
         try:
             scan_id = input_data[self.config['scan_id_key_name']]
         except Exception:
@@ -138,6 +146,7 @@ class GetScanResult(Action):
         Result:
         a string representing the file content.
         """
+        self.logger.debug('Fetching scan result from file system')
         file_name = f"{self.config['path']}{scan_id}.txt"
         return FileHelper.read(file_name)
 
@@ -146,6 +155,7 @@ class GetScanHistory(Action):
     def __init__(self, config):
         """Initialize the action with a given configuration dictionary."""
         self.config = config
+        self.logger = logging.getLogger()
     
     def execute(self, input_data):
         """Retrieves the scan history from the file system and adds all the
@@ -157,12 +167,8 @@ class GetScanHistory(Action):
         Return value:\n
         a dictionary including the action's output and all previous inputs.
         """
-        print("GetScanHistory action")
-        try:
-            file_names = self.get_file_names()
-        except Exception as error:
-            print(error)
-
+        self.logger.debug('Running GetScanHistory action')
+        file_names = self.get_file_names()
         input_data[self.config['output_key_name']] = file_names
         input_data['next_action'] = self.config['next_action']
         return input_data
@@ -172,6 +178,7 @@ class GetScanHistory(Action):
         Return value:\n
         a list of strings representing each file in the path.
         """
+        self.logger.debug('Fetching file names from directory')
         return FileHelper.get_files_from_dir(self.config['path'])
 
 
@@ -180,6 +187,7 @@ class BuildCommand(Action):
     def __init__(self, config):
         """Initialize the action with a given configuration dictionary."""
         self.config = config
+        self.logger = logging.getLogger()
 
     def execute(self, input_data):
         """Creates a command using a mappings dictionary from the action's config
@@ -192,7 +200,7 @@ class BuildCommand(Action):
         Return value:\n
         a dictionary including the action's output and all previous inputs.
         """
-        print("BuildCommand action")
+        self.logger.debug('Running BuildCommand action')
         optional_args = []
         positional_args = []
         for key, val in self.config['mappings'].items():
@@ -213,6 +221,7 @@ class ExecuteCommand(Action):
     def __init__(self, config):
         """Initialize the action with a given configuration dictionary."""
         self.config = config
+        self.logger = logging.getLogger()
 
     def execute(self, input_data):
         """Extracts the command to execute from the input_data dictionary,
@@ -225,7 +234,7 @@ class ExecuteCommand(Action):
         Return value:\n
         a dictionary including the action's output and all previous inputs.
         """
-        print('ExecuteCommand action')
+        self.logger.debug('Running ExecuteCommand action')
         cmd_stdout = []
         for line in self.run_command(input_data['cmd_str'].split()):
             decoded_line = line.decode('utf-8')
@@ -245,6 +254,7 @@ class ExecuteCommand(Action):
         Return value:\n
         an iterator pointing to the first item of the stdout.
         """
+        self.logger.debug('Running command in a child process')
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) # TODO: redirect stderr to stdout but change it later
         return iter(p.stdout.readline, b'')
 
@@ -253,6 +263,7 @@ class SaveScanResult(Action):
     def __init__(self, config):
         """Initialize action with a given configuration dictionary."""
         self.config = config
+        self.logger = logging.getLogger()
 
     def execute(self, input_data):
         """Extracts the scan result from the input_data object and save it to a new file
@@ -265,7 +276,7 @@ class SaveScanResult(Action):
         Return value:\n
         a dictionary including the action's output and all previous inputs.
         """
-        print("SaveScanResult action")
+        self.logger.debug('Running SaveScanResult action')
         self.save_scan_result(self.create_filename(input_data), input_data['cmd_stdout'])
         input_data['next_action'] = self.config['next_action']
         return input_data
@@ -279,6 +290,7 @@ class SaveScanResult(Action):
         Return value:\n
         a string representing the file name.
         """
+        self.logger.debug('Creating filename using scan id')
         scan_id = input_data['scanid']
         path = self.config['path']
         filename = f'{path}{scan_id}.txt'
@@ -291,6 +303,7 @@ class SaveScanResult(Action):
         filename -- a string representing the file path.\n
         result   -- a set of strings to be saved in the file.\n
         """
+        self.logger.debug('Saving scan result in a new file')
         FileHelper.write_lines(filename, result)
 
 class PrintStdout(Action):
@@ -298,6 +311,7 @@ class PrintStdout(Action):
     def __init__(self, config):
         """Initialize the action with a given configuration dictionary."""
         self.config = config
+        self.logger = logging.getLogger()
 
     def execute(self, input_data):
         """Extracts the content from input_data dictionary and print it in the stdout.
@@ -308,7 +322,7 @@ class PrintStdout(Action):
         Return value:\n
         a dictionary including the action's output and all previous inputs.
         """
-        print("PrintStdout action")
+        self.logger.debug('Running PrintStdout action')
         stdout_input = input_data['stdout_input']
         if type(stdout_input) == str:
             print(stdout_input)

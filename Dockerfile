@@ -21,6 +21,8 @@ RUN pip3 install pipenv
 
 ADD . ./oscaptool/
 
+RUN mkdir logs
+
 WORKDIR /home/oscaptool/oscaptool
 
 RUN pipenv --python /bin/python3.6 install -e .

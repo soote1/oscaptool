@@ -1,0 +1,410 @@
+{
+    "app_name": "oscaptool",
+    "argparser": {
+      "prog": "oscaptool",
+      "args": [],
+      "subparsers": {
+        "id": "action",
+        "required": true,
+        "subparsers_cfgs": [
+          {
+            "name": "scan",
+            "help": "Perform regular openscap scans",
+            "args": [],
+            "subparsers": {
+              "id": "scantype",
+              "required": true,
+              "subparsers_cfgs": [
+                {
+                  "name": "oval",
+                  "help": "Evaluate oval definitions",
+                  "args": [
+                    {
+                      "type": "opt",
+                      "id": "--directives",
+                      "id2": "--dir"
+                    }
+                  ],
+                  "subparsers": {
+                    "id": "scansubtype",
+                    "required": true,
+                    "subparsers_cfgs": [
+                      {
+                        "name": "1",
+                        "help": "Evaluate all definitions within the given OVAL Definition file",
+                        "args": [
+                          {
+                            "type": "pos",
+                            "id": "oval-results"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "scap-oval"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "2",
+                        "help": "Evaluate one particular definition within the given OVAL Definition file",
+                        "args": [
+                          {
+                            "type": "pos",
+                            "id": "definition-id"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "oval-results"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "scap-oval"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "3",
+                        "help":"Evaluate all definitions from the OVAL component that are part of a particular data stream within a SCAP data stream collection",
+                        "args": [
+                          {
+                            "type": "pos",
+                            "id": "datastream-id"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "oval-id"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "oval-results"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "scap-ds"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "name": "xccdf",
+                  "help": "Evaluate XCCDF rules from XCCDF file",
+                  "args": [],
+                  "subparsers": {
+                    "id": "scansubtype",
+                    "required": true,
+                    "subparsers_cfgs": [
+                      {
+                        "name": "1",
+                        "help": "evaluate a specific profile in an XCCDF file",
+                        "args": [
+                          {
+                            "type": "pos",
+                            "id": "profile"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "results"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "cpe-dict"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "scap-xccdf"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "2",
+                        "help": "Evaluate a specific XCCDF rule",
+                        "args": [
+                          {
+                            "type": "pos",
+                            "id": "profile"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "rule"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "results"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "cpe-dict"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "scap-xccdf"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "name": "ds",
+                  "help": "Evaluate XCCDF rules from a DataStream",
+                  "args": [],
+                  "subparsers": {
+                    "id": "scansubtype",
+                    "required": true,
+                    "subparsers_cfgs": [
+                      {
+                        "name": "1",
+                        "help": "Evaluate a specific XCCDF benchmark that is part of a DataStream within a SCAP DataStream collection",
+                        "args": [
+                          {
+                            "type": "pos",
+                            "id": "datastream-id"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "xccdf-id"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "results"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "scap-ds"
+                          }
+                        ]
+                      },
+                      {
+                        "name": "2",
+                        "help": "Evaluate a specific XCCDF benchmark that is part of a DataStream within a SCAP DataStream collection",
+                        "args": [
+                          {
+                            "type": "pos",
+                            "id": "benchmark-id"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "results"
+                          },
+                          {
+                            "type": "pos",
+                            "id": "scap-ds"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "show",
+            "help": "Show scans from scan history",
+            "args": [
+              {
+                "type": "opt",
+                "id": "--scan-id",
+                "id2": "--sid"
+              }
+            ]
+          },
+          {
+            "name": "comp",
+            "help": "Compare two scan results and show statistics",
+            "args": [
+              {
+                "type": "pos",
+                "id": "scan-id-1"
+              },
+              {
+                "type": "pos",
+                "id": "scan-id-2"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "actionmanager": {
+      "max_attempts": 1,
+      "workflows": {
+        "scan-oval-1": {
+          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+            "next_action":"build_command"
+          }},
+          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+            "command":"oscap oval eval",
+            "mappings":{
+              "oval-results":"--results",
+              "scap-oval":""
+            },
+            "next_action":"execute_command"
+          }},
+          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+            "next_action":"",
+            "path":"/home/oscaptool/scan_results/"
+            }}
+        },
+        "scan-oval-2": {
+          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+            "next_action":"build_command"
+          }},
+          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+            "command":"oscap oval eval",
+            "mappings":{
+              "definition-id":"--id",
+              "oval-results":"--results",
+              "scap-oval":""
+            },
+            "next_action":"execute_command"
+          }},
+          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+            "next_action":"",
+            "path":"/home/oscaptool/scan_results/"
+            }}
+        },
+        "scan-oval-3": {
+          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+            "next_action":"build_command"
+          }},
+          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+            "command":"oscap oval eval",
+            "mappings":{
+              "datastream-id":"--datastream-id",
+              "oval-id":"--oval-id",
+              "oval-results":"--results",
+              "scap-ds":""
+            },
+            "next_action":"execute_command"
+          }},
+          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+            "next_action":"",
+            "path":"/home/oscaptool/scan_results/"
+            }}
+        },
+        "scan-xccdf-1": {
+          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+            "next_action":"build_command"
+          }},
+          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+            "command":"oscap xccdf eval",
+            "mappings":{
+              "profile":"--profile",
+              "cpe-dict":"--cpe",
+              "results":"--results",
+              "scap-xccdf":""
+            },
+            "next_action":"execute_command"
+          }},
+          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+            "next_action":"",
+            "path":"/home/oscaptool/scan_results/"
+            }}
+        },
+        "scan-xccdf-2": {
+          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+            "next_action":"build_command"
+          }},
+          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+            "command":"oscap xccdf eval",
+            "mappings":{
+              "rule":"--rule",
+              "profile":"--profile",
+              "cpe-dict":"--cpe",
+              "results":"--results",
+              "scap-xccdf":""
+            },
+            "next_action":"execute_command"
+          }},
+          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+            "next_action":"",
+            "path":"/home/oscaptool/scan_results/"
+            }}
+        },
+        "scan-ds-1": {
+          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+            "next_action":"build_command"
+          }},
+          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+            "command":"oscap xccdf eval",
+            "mappings":{
+              "datastream-id":"--datastream-id",
+              "xccdf-id":"--xccdf-id",
+              "results":"--results",
+              "scap-ds":""
+            },
+            "next_action":"execute_command"
+          }},
+          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+            "next_action":"",
+            "path":"/home/oscaptool/scan_results/"
+            }}
+        },
+        "scan-ds-2": {
+          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+            "next_action":"build_command"
+          }},
+          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+            "command":"oscap xccdf eval",
+            "mappings":{
+              "benchmark-id":"--benchmark-id",
+              "results":"--results",
+              "scap-ds":""
+            },
+            "next_action":"execute_command"
+          }},
+          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+            "next_action":"",
+            "path":"/home/oscaptool/scan_results/"
+            }}
+        },
+        "show-scan-history": {
+          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"GetScanHistory", "config":{
+            "path":"/home/oscaptool/scan_results/",
+            "output_key_name":"stdout_input",
+            "next_action":"print_stdout"
+          }},
+          "print_stdout": {"module":"oscaptool.sample.actionmanager.actions", "class":"PrintStdout", "config":{"next_action":""}}
+        },
+        "show-scan-result": {
+          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"GetScanResult", "config":{
+            "path":"/home/oscaptool/scan_results/",
+            "scan_id_key_name":"scan_id",
+            "output_key_name":"stdout_input",
+            "next_action":"print_stdout"
+            }},
+          "print_stdout": {"module":"oscaptool.sample.actionmanager.actions", "class":"PrintStdout", "config":{"next_action":""}}
+        },
+        "comp-scan-results": {
+          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"GetScanResult", "config":{
+            "path":"/home/oscaptool/scan_results/",
+            "scan_id_key_name":"scan-id-1",
+            "output_key_name":"scan_result_1",
+            "next_action":"get_scan_result_2"
+          }},
+          "get_scan_result_2": {"module":"oscaptool.sample.actionmanager.actions", "class":"GetScanResult", "config":{
+            "path":"/home/oscaptool/scan_results/",
+            "scan_id_key_name":"scan-id-2",
+            "output_key_name":"scan_result_2",
+            "next_action":"compare_scan_results"
+          }},
+          "compare_scan_results": {"module":"oscaptool.sample.actionmanager.actions", "class":"CompareScanResults", "config":{
+            "scan_result_1_key_name":"scan_result_1",
+            "scan_result_2_key_name":"scan_result_2",
+            "output_key_name":"stdout_input",
+            "next_action":"print_stdout"
+          }},
+          "print_stdout": {"module":"oscaptool.sample.actionmanager.actions", "class":"PrintStdout", "config":{"next_action":""}}
+        }
+      }
+    }
+  }

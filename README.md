@@ -60,8 +60,8 @@ Before start using the cli tool, run the following command to identify the avail
 ```bash
 oscaptool --help
 ```
-
 oscaptool logs information using a RotatingFileHandler. You can find all related files in /home/oscaptool/logs/ directory.
+  
 Testing
 ------
 Unit tests are under development. Meanwhile, you can run the following commands to exercise the features:  

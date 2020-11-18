@@ -1,0 +1,25 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "531171dd46e7eb006ecf799d8c68bbfc85a410b47582daf81bb4e68532809e79"
+        },
+        "pipfile-spec": 6,
+        "requires": {
+            "python_version": "3.8"
+        },
+        "sources": [
+            {
+                "name": "pypi",
+                "url": "https://pypi.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "oscaptool": {
+            "editable": true,
+            "path": "."
+        }
+    },
+    "develop": {}
+}

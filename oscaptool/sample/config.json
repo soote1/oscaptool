@@ -231,10 +231,10 @@
       "max_attempts": 1,
       "workflows": {
         "scan-oval-1": {
-          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+          "initial_action": {"module":"oscaptool.sample.actions", "class":"CreateScanId", "config":{
             "next_action":"build_command"
           }},
-          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+          "build_command": {"module":"oscaptool.sample.actions", "class":"BuildCommand", "config":{
             "command":"oscap oval eval",
             "mappings":{
               "oval-results":"--results",
@@ -242,17 +242,17 @@
             },
             "next_action":"execute_command"
           }},
-          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
-          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+          "execute_command": {"module":"oscaptool.sample.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actions", "class":"SaveScanResult", "config":{
             "next_action":"",
             "path":"/home/oscaptool/scan_results/"
             }}
         },
         "scan-oval-2": {
-          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+          "initial_action": {"module":"oscaptool.sample.actions", "class":"CreateScanId", "config":{
             "next_action":"build_command"
           }},
-          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+          "build_command": {"module":"oscaptool.sample.actions", "class":"BuildCommand", "config":{
             "command":"oscap oval eval",
             "mappings":{
               "definition-id":"--id",
@@ -261,17 +261,17 @@
             },
             "next_action":"execute_command"
           }},
-          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
-          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+          "execute_command": {"module":"oscaptool.sample.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actions", "class":"SaveScanResult", "config":{
             "next_action":"",
             "path":"/home/oscaptool/scan_results/"
             }}
         },
         "scan-oval-3": {
-          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+          "initial_action": {"module":"oscaptool.sample.actions", "class":"CreateScanId", "config":{
             "next_action":"build_command"
           }},
-          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+          "build_command": {"module":"oscaptool.sample.actions", "class":"BuildCommand", "config":{
             "command":"oscap oval eval",
             "mappings":{
               "datastream-id":"--datastream-id",
@@ -281,17 +281,17 @@
             },
             "next_action":"execute_command"
           }},
-          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
-          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+          "execute_command": {"module":"oscaptool.sample.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actions", "class":"SaveScanResult", "config":{
             "next_action":"",
             "path":"/home/oscaptool/scan_results/"
             }}
         },
         "scan-xccdf-1": {
-          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+          "initial_action": {"module":"oscaptool.sample.actions", "class":"CreateScanId", "config":{
             "next_action":"build_command"
           }},
-          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+          "build_command": {"module":"oscaptool.sample.actions", "class":"BuildCommand", "config":{
             "command":"oscap xccdf eval",
             "mappings":{
               "profile":"--profile",
@@ -301,17 +301,17 @@
             },
             "next_action":"execute_command"
           }},
-          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
-          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+          "execute_command": {"module":"oscaptool.sample.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actions", "class":"SaveScanResult", "config":{
             "next_action":"",
             "path":"/home/oscaptool/scan_results/"
             }}
         },
         "scan-xccdf-2": {
-          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+          "initial_action": {"module":"oscaptool.sample.actions", "class":"CreateScanId", "config":{
             "next_action":"build_command"
           }},
-          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+          "build_command": {"module":"oscaptool.sample.actions", "class":"BuildCommand", "config":{
             "command":"oscap xccdf eval",
             "mappings":{
               "rule":"--rule",
@@ -322,17 +322,17 @@
             },
             "next_action":"execute_command"
           }},
-          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
-          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+          "execute_command": {"module":"oscaptool.sample.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actions", "class":"SaveScanResult", "config":{
             "next_action":"",
             "path":"/home/oscaptool/scan_results/"
             }}
         },
         "scan-ds-1": {
-          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+          "initial_action": {"module":"oscaptool.sample.actions", "class":"CreateScanId", "config":{
             "next_action":"build_command"
           }},
-          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+          "build_command": {"module":"oscaptool.sample.actions", "class":"BuildCommand", "config":{
             "command":"oscap xccdf eval",
             "mappings":{
               "datastream-id":"--datastream-id",
@@ -342,17 +342,17 @@
             },
             "next_action":"execute_command"
           }},
-          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
-          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+          "execute_command": {"module":"oscaptool.sample.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actions", "class":"SaveScanResult", "config":{
             "next_action":"",
             "path":"/home/oscaptool/scan_results/"
             }}
         },
         "scan-ds-2": {
-          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"CreateScanId", "config":{
+          "initial_action": {"module":"oscaptool.sample.actions", "class":"CreateScanId", "config":{
             "next_action":"build_command"
           }},
-          "build_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"BuildCommand", "config":{
+          "build_command": {"module":"oscaptool.sample.actions", "class":"BuildCommand", "config":{
             "command":"oscap xccdf eval",
             "mappings":{
               "benchmark-id":"--benchmark-id",
@@ -361,49 +361,49 @@
             },
             "next_action":"execute_command"
           }},
-          "execute_command": {"module":"oscaptool.sample.actionmanager.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
-          "save_scan_result": {"module":"oscaptool.sample.actionmanager.actions", "class":"SaveScanResult", "config":{
+          "execute_command": {"module":"oscaptool.sample.actions", "class":"ExecuteCommand", "config":{"next_action":"save_scan_result"}},
+          "save_scan_result": {"module":"oscaptool.sample.actions", "class":"SaveScanResult", "config":{
             "next_action":"",
             "path":"/home/oscaptool/scan_results/"
             }}
         },
         "show-scan-history": {
-          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"GetScanHistory", "config":{
+          "initial_action": {"module":"oscaptool.sample.actions", "class":"GetScanHistory", "config":{
             "path":"/home/oscaptool/scan_results/",
             "output_key_name":"stdout_input",
             "next_action":"print_stdout"
           }},
-          "print_stdout": {"module":"oscaptool.sample.actionmanager.actions", "class":"PrintStdout", "config":{"next_action":""}}
+          "print_stdout": {"module":"oscaptool.sample.actions", "class":"PrintStdout", "config":{"next_action":""}}
         },
         "show-scan-result": {
-          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"GetScanResult", "config":{
+          "initial_action": {"module":"oscaptool.sample.actions", "class":"GetScanResult", "config":{
             "path":"/home/oscaptool/scan_results/",
             "scan_id_key_name":"scan_id",
             "output_key_name":"stdout_input",
             "next_action":"print_stdout"
             }},
-          "print_stdout": {"module":"oscaptool.sample.actionmanager.actions", "class":"PrintStdout", "config":{"next_action":""}}
+          "print_stdout": {"module":"oscaptool.sample.actions", "class":"PrintStdout", "config":{"next_action":""}}
         },
         "comp-scan-results": {
-          "initial_action": {"module":"oscaptool.sample.actionmanager.actions", "class":"GetScanResult", "config":{
+          "initial_action": {"module":"oscaptool.sample.actions", "class":"GetScanResult", "config":{
             "path":"/home/oscaptool/scan_results/",
             "scan_id_key_name":"scan-id-1",
             "output_key_name":"scan_result_1",
             "next_action":"get_scan_result_2"
           }},
-          "get_scan_result_2": {"module":"oscaptool.sample.actionmanager.actions", "class":"GetScanResult", "config":{
+          "get_scan_result_2": {"module":"oscaptool.sample.actions", "class":"GetScanResult", "config":{
             "path":"/home/oscaptool/scan_results/",
             "scan_id_key_name":"scan-id-2",
             "output_key_name":"scan_result_2",
             "next_action":"compare_scan_results"
           }},
-          "compare_scan_results": {"module":"oscaptool.sample.actionmanager.actions", "class":"CompareScanResults", "config":{
+          "compare_scan_results": {"module":"oscaptool.sample.actions", "class":"CompareScanResults", "config":{
             "scan_result_1_key_name":"scan_result_1",
             "scan_result_2_key_name":"scan_result_2",
             "output_key_name":"stdout_input",
             "next_action":"print_stdout"
           }},
-          "print_stdout": {"module":"oscaptool.sample.actionmanager.actions", "class":"PrintStdout", "config":{"next_action":""}}
+          "print_stdout": {"module":"oscaptool.sample.actions", "class":"PrintStdout", "config":{"next_action":""}}
         }
       }
     }

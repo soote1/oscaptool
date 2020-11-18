@@ -1,0 +1,9 @@
+version: "3.7"
+services:
+    oscaptool:
+        build: 
+            context: .
+            dockerfile: ./Dockerfile
+        container_name: oscaptool
+        command: []
+        network_mode: host

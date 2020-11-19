@@ -24,22 +24,38 @@ class Client:
     """A class to represent the main process."""
     def __init__(self, config):
         """Initialize client with a given configuration dictionary."""
-        self.config = config
         self.logger = logging.getLogger()
+        self.config = config
+        self.init_objects()
+
+    def init_objects(self):
+        """Initialize argsparser and actionmanager using config dict."""
+        try:
+            self.logger.debug('Initializing argsparser and actionmanager')
+            self._args_parser = ArgsParser(self.config[ARGPARSER])
+            self._action_manager = ActionManager(self.config[ACTIONMANAGER])
+        except:
+            self.logger.critical('Critical error while trying to initialize objects', exc_info=1)
+            raise
 
     def run(self):
-        """Gets the list of arguments from the sys module and
-        executes the parsing and workflow processes.
-        """
-        self.logger.debug('Reading args from input')
+        """Run parsing arguments and execute workflow processes."""
+        self.execute_workflow(self.parse_args())
+    
+    def parse_args(self):
+        """Executes argument parsing logic"""
+        self.logger.debug('Starting parsing process')
         args = sys.argv[1:]
-        argsparser = ArgsParser(self.config[ARGPARSER])
-        parsed_args = argsparser.parse(args)
+        return self._args_parser.parse(args)
 
-        self.logger.debug('Interpreting parsed args')
-        workflow_metadata = self.build_workflow_metadata(parsed_args)
-        action_manager = ActionManager(self.config[ACTIONMANAGER])
-        action_manager.run_workflow(workflow_metadata)
+    def execute_workflow(self, parsed_args):
+        """Executes a workflow using action manager."""
+        try:
+            self.logger.debug('Interpreting parsed args')
+            self._action_manager.run_workflow(self.build_workflow_metadata(parsed_args))
+        except:
+            self.logger.critical('Critical error while trying to run workflow', exc_info=1)
+            raise
 
     def build_workflow_metadata(self, parsed_args):
         """Creates a WorkflowMetadata object from a set of parsed args."""

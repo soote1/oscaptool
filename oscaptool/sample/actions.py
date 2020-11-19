@@ -25,6 +25,7 @@ CMD_STDOUT = 'cmd_stdout'
 STDOUT_INPUT = 'stdout_input'
 
 class ScanStats:
+    """A class to represent scan result stats"""
     def __init__(self, pass_count, fail_count, na_count, total):
         self.pass_count = pass_count
         self.fail_count = fail_count
@@ -33,6 +34,16 @@ class ScanStats:
     
     def __repr__(self):
         return f'total: {self.total} pass: {self.pass_count} fail: {self.fail_count} notapplicable: {self.na_count}'
+
+class ScanResultComparison:
+    """A class to represent a comparison between two scan results"""
+    def __init__(self, scan1, scan2, diff):
+        self._scan1 = scan1
+        self._scan2 = scan2
+        self._diff = diff
+
+    def __repr__(self):
+        return f'scan1: {self._scan1}\nscan2: {self._scan2}\ndiff: {self._diff}'
 
 class CreateScanId(Action):
     """A class to create the scan id."""
@@ -80,9 +91,9 @@ class CompareScanResults(Action):
         self.logger.debug('Running CompareScanResults action')
         scan_stats_1 = self.get_scan_stats(input_data[self.config[SCAN_RESULT_1_KEY_NAME]])
         scan_stats_2 = self.get_scan_stats(input_data[self.config[SCAN_RESULT_2_KEY_NAME]])
-        stats_comaparison = self.diff_stats(scan_stats_1, scan_stats_2)
-        output_str = self.create_output_str(scan_stats_1, scan_stats_2, stats_comaparison)
-        input_data[self.config[OUTPUT_KEY_NAME]] = output_str
+        diff_stats = self.diff_stats(scan_stats_1, scan_stats_2)
+
+        input_data[self.config[OUTPUT_KEY_NAME]] = str(ScanResultComparison(scan_stats_1, scan_stats_2, diff_stats))
         input_data[NEXT_ACTION] = self.config[NEXT_ACTION]
         return input_data
      
@@ -120,23 +131,6 @@ class CompareScanResults(Action):
         na_diff = abs(stats1.na_count-stats2.na_count)
         total_diff = pass_diff + fail_diff + na_diff
         return ScanStats(pass_diff, fail_diff, na_diff, total_diff)
-
-    def create_output_str(self, stats1, stats2, diff):
-        """Creates a string representation of each stats (stats1, stats2, diff).
-
-        Positional arguments:\n
-        stats1 -- a dictionary including the counts for each result type\n
-        stats2 -- a dictionary including the counts for each result type\n
-        diff   -- a dictionary including the diffs between stats1 and stats2\n
-
-        Return value:\n
-        a string representing the data on each input.
-        """
-        self.logger.debug('Building string representation for stats')
-        scan_1_stats_str = f"Scan 1 - {stats1}"
-        scan_2_stats_str = f"Scan 2 - {stats2}"
-        diff_str  = f"Diff - {diff}"
-        return f'{scan_1_stats_str}\n{scan_2_stats_str}\n{diff_str}'
 
 class GetScanResult(Action):
     """A class to retrieve a scan result from the file system."""

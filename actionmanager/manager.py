@@ -23,54 +23,79 @@ class ActionManager:
 
     def __init__(self, config):
         """Prepares the action manager instance with a given configuration."""
-        self.config = config
+        self._config = config
+        self._current_output = None
+        self._current_action = None
+        self._workflow_config = None
 
     def run_workflow(self, workflow_metadata):
         """Executes a list of actions in sequential order, passing an input object as
         the argument. The execution stops when the next_action key in the output is an empty string.
 
-        Positional arguments:\n
-        workflow_metadata -- an object including the workflow to be executed and the initial inputs.
+        - Positional arguments:
+            workflow_metadata -- an object including the workflow to be executed and the initial inputs.
 
-        Exceptions:\n
-        If the action manager can't read the next action, it throws an ActionManagerError.\n
-        If the action manager receives an ActionError, it would stop the execution.\n
-
-        Return value:\n
-        a boolean value that indicating wether the execution of the workflow was successful or not.
+        - Exceptions:
+            An Action manager error is raised if:
+                Can't set initial values
+                Can't set next action
+                Can't create and action using action metadata
+            An ActionError is raised if:
+                Action's execute() method throws any exception
         """
-        output = workflow_metadata._inputs
-        workflow_config = self.config['workflows'][workflow_metadata._id]
-        self.current_action = self.create_action(workflow_config[ActionManager.INITIAL_ACTION])
         try:
+            self.set_initial_values(workflow_metadata)
             while True:
-                output = self.current_action.execute(output)
-                next_action_name = output[ActionManager.NEXT_ACTION]
-                if not next_action_name:
+                self._output = self._current_action.execute(self._output)
+                self.set_next_action()
+                if not self._current_action:
                     break
-                
-                self.current_action = self.create_action(workflow_config[next_action_name])
-            return True
-        except KeyError:
-            raise ActionManagerError(f"No action metadata for {next_action_name}")
-            
+        except ActionManagerError:
+            raise
+        except Exception as error:
+            raise ActionError(str(error))
+
+    def set_next_action(self):
+        """Create next action to be executed."""
+        try:
+            next_action_name = self._output[ActionManager.NEXT_ACTION]
+            if next_action_name == '':
+                self._current_action = None
+            else:
+                self._current_action = self.create_action(self._workflow_config[next_action_name])
+        except ActionManagerError:
+            raise
+        except Exception as error:
+            msg = f'error while setting next action: {str(error)}'
+            raise ActionManagerError(msg)
+    
+    def set_initial_values(self, workflow_metadata):
+        """Initialize main objects for action manager"""
+        try:
+            self._output = workflow_metadata._inputs
+            self._workflow_config = self._config['workflows'][workflow_metadata._id]
+            self._current_action = self.create_action(self._workflow_config[ActionManager.INITIAL_ACTION])
+        except ActionManagerError:
+            raise
+        except Exception as error:
+            msg = f'error while setting initial values: {str(error)}'
+            raise ActionManagerError(msg)
     
     def create_action(self, action_metadata):
         """Returns a new object matching the given action metadata.
 
-        Exceptions:\n
-        An ActionManagerError is thrown if can't create action instance.
+        Exceptions:
+            An ActionManagerError is thrown if can't create action instance.
 
-        Return value:\n
-        an instance of Action class.
+        Return value:
+            An instance of Action class.
         """
         try:
-            action = ActionFactory.create_action(
+            return ActionFactory.create_action(
                 action_metadata[ActionManager.MODULE], 
                 action_metadata[ActionManager.CLASS], 
                 action_metadata[ActionManager.CONFIG]
             )
-        except:
-            raise ActionManagerError(f"Error while creating action instance using {action_metadata}")
-        
-        return action
+        except Exception as error:
+            msg = f'error while creating action using action metadata: {str(error)}'
+            raise ActionManagerError(msg)

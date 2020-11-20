@@ -32,8 +32,8 @@ class ArgsParser:
         """Add subparsers to parent parser recursively.
 
         Positional arguments:
-        subparsers_config -- the configuration dict for the current subparser
-        parent_parser     -- the parent object to add the parsers to.
+            subparsers_config -- the configuration dict for the current subparser
+            parent_parser     -- the parent object to add the parsers to.
         """
         self.logger.debug('Loading subparsers recursively')
         # create subparsers
@@ -58,11 +58,11 @@ class ArgsParser:
     def parse(self, arguments):
         """Parse a list of arguments and return a dictionary with the result.
         
-        Positional arguments:\n
-        arguments -- a list of strings representing arguments\n
+        Positional arguments:
+            arguments -- a list of strings representing arguments
 
-        Return value:\n
-        a dictionary with the result of argparse.ArgumentParser.parse_args()
+        Return value:
+            a dictionary with the result of argparse.ArgumentParser.parse_args()
         """
         self.logger.debug('Parsing arguments')
         args = self.parser.parse_args(arguments)
@@ -87,11 +87,11 @@ class FileHelper:
     def read(filename):
         """Open a file in read mode and extract the content.
 
-        Positional arguments:\n
-        filename -- a string representing the file's absolute path\n
+        Positional arguments:
+            filename -- a string representing the file's absolute path
 
-        Return value:\n
-        a string representing the file content
+        Return value:
+            a string representing the file content
         """
         data = None
         with open(filename) as file_reader:
@@ -102,10 +102,10 @@ class FileHelper:
     def get_files_from_dir(dir_path):
         """Get the names of all the files in a given directory.
         
-        Positional arguments:\n
-        dir_path -- a string representing the absolute path to the directory.
+        Positional arguments:
+            dir_path -- a string representing the absolute path to the directory.
 
-        Return valule:\n
-        a list of strings, each string representing a file in the directory.
+        Return valule:
+            a list of strings, each string representing a file in the directory.
         """
         return [file for file in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, file))]

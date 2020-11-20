@@ -54,13 +54,13 @@ class CreateScanId(Action):
 
     def execute(self, input_data):
         """Creates a unique scan id using the current timestamp, scan type
-        and scan subtype. Adds the calculated id to the input_values dict.\n
+        and scan subtype. Adds the calculated id to the input_values dict.
 
-        Positional arguments:\n
-        input_data -- a dictionary including all inputs required for the action.\n
+        Positional arguments:
+            input_data -- a dictionary including all inputs required for the action.
 
-        Return value:\n
-        a dictionary including the action's output and all previous inputs.\n
+        Return value:
+            a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running CreateScanId action')
         current_timestamp = int(time.time())
@@ -80,13 +80,13 @@ class CompareScanResults(Action):
     def execute(self, input_data):
         """Calculates stats (total, pass, fail and notapplicable results)
         for each scan result, then calculates the diff between both stats. Adds the
-        final result to the input_values dictionary.\n
+        final result to the input_values dictionary.
 
-        Positional arguments:\n
-        input_data -- a dictionary including all inputs required for the action.\n
+        Positional arguments:
+            input_data -- a dictionary including all inputs required for the action.
 
-        Return value:\n
-        a dictionary including the action's output and all previous inputs.
+        Return value:
+            a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running CompareScanResults action')
         scan_stats_1 = self.get_scan_stats(input_data[self.config[SCAN_RESULT_1_KEY_NAME]])
@@ -99,13 +99,13 @@ class CompareScanResults(Action):
      
     def get_scan_stats(self, scan_result_str):
         """Uses a regular expression to extract all instances of a word (pass, fail, notapplicable)
-        in a string, then counts the repetitions of each word and returns an object with the results.\n
+        in a string, then counts the repetitions of each word and returns an object with the results.
 
-        Positional arguments:\n
-        scan_result_str -- a string representing a scan result\n
+        Positional arguments:
+            scan_result_str -- a string representing a scan result
 
-        Return value:\n
-        a dictionary including the counts for each word.
+        Return value:
+            a dictionary including the counts for each word.
         """
         self.logger.debug('Creating stats object for scan result')
         pass_count = len(re.findall(PASS_SCAN_RESULT, scan_result_str))
@@ -118,12 +118,12 @@ class CompareScanResults(Action):
         """Calculates the absolute difference between each stats object 
         and returns a new object with the results.
 
-        Positional arguments:\n
-        stats1 -- a dictionary including the counts for each result type\n
-        stats2 -- a dictionary including the counts for each result type\n
+        Positional arguments:
+            stats1 -- a dictionary including the counts for each result type
+            stats2 -- a dictionary including the counts for each result type
 
-        Return value:\n
-        a dictionary including the diff between stats.
+        Return value:
+            a dictionary including the diff between stats.
         """
         self.logger.debug('Creating diff object using scan result objects')
         pass_diff = abs(stats1.pass_count-stats2.pass_count)
@@ -142,13 +142,13 @@ class GetScanResult(Action):
     def execute(self, input_data):
         """Extracts the scan id from the input_data object and uses a helper class
         to search for the file and extract the content as a string. Puts the output
-        in the input_data dictionary.\n
+        in the input_data dictionary.
 
-        Positional arguments:\n
-        input_data -- a dictionary including all inputs required for the action.\n
+        Positional arguments:
+            input_data -- a dictionary including all inputs required for the action.
 
-        Return value:\n
-        a dictionary including the action's output and all previous inputs.
+        Return value:
+            a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running GetScanResult action')
         try:
@@ -165,10 +165,10 @@ class GetScanResult(Action):
         Passes the file path to a helper class to retrieve the file content as a string.
 
         Positional arguments:
-        scan_id -- a string representing a scan id
+            scan_id -- a string representing a scan id
 
         Result:
-        a string representing the file content.
+            a string representing the file content.
         """
         self.logger.debug('Fetching scan result from file system')
         file_name = f"{self.config[PATH]}{scan_id}.txt"
@@ -183,13 +183,13 @@ class GetScanHistory(Action):
     
     def execute(self, input_data):
         """Retrieves the scan history from the file system and adds all the
-        file names to the input_data object.\n
+        file names to the input_data object.
 
-        Positional arguments:\n
-        input_data -- a dictionary including all inputs required for the action.\n
+        Positional arguments:
+            input_data -- a dictionary including all inputs required for the action.
 
-        Return value:\n
-        a dictionary including the action's output and all previous inputs.
+        Return value:
+            a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running GetScanHistory action')
         file_names = self.get_file_names()
@@ -199,8 +199,9 @@ class GetScanHistory(Action):
     
     def get_file_names(self):
         """Use a helper class to list all files in a given path.
-        Return value:\n
-        a list of strings representing each file in the path.
+
+        Return value:
+            a list of strings representing each file in the path.
         """
         self.logger.debug('Fetching file names from directory')
         return FileHelper.get_files_from_dir(self.config[PATH])
@@ -216,13 +217,13 @@ class BuildCommand(Action):
     def execute(self, input_data):
         """Creates a command using a mappings dictionary from the action's config
         and the original arguments from the input_data dictionary. Puts the result
-        in the input_data object.\n
+        in the input_data object.
 
-        Positional arguments:\n
-        input_data -- a dictionary including all inputs required for the action.\n
+        Positional arguments:
+            input_data -- a dictionary including all inputs required for the action.
 
-        Return value:\n
-        a dictionary including the action's output and all previous inputs.
+        Return value:
+            a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running BuildCommand action')
         optional_args = []
@@ -250,13 +251,13 @@ class ExecuteCommand(Action):
     def execute(self, input_data):
         """Extracts the command to execute from the input_data dictionary,
         then uses the subprocess module to run the command and capture the
-        stdout. Puts the command output in the input_data dictionary.\n
+        stdout. Puts the command output in the input_data dictionary.
 
-        Positional arguments:\n
-        input_data -- a dictionary including all inputs required for the action.\n
+        Positional arguments:
+            input_data -- a dictionary including all inputs required for the action.
 
-        Return value:\n
-        a dictionary including the action's output and all previous inputs.
+        Return value:
+            a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running ExecuteCommand action')
         cmd_stdout = []
@@ -272,11 +273,11 @@ class ExecuteCommand(Action):
         """Use subprocess module to run a command and return an iterator to the
         stdout.
 
-        Positional arguments:\n
-        cmd -- a string representing the command to be executed.
+        Positional arguments:
+            cmd -- a string representing the command to be executed.
 
-        Return value:\n
-        an iterator pointing to the first item of the stdout.
+        Return value:
+            an iterator pointing to the first item of the stdout.
         """
         self.logger.debug('Running command in a child process')
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT) # TODO: redirect stderr to stdout but change it later
@@ -292,13 +293,13 @@ class SaveScanResult(Action):
     def execute(self, input_data):
         """Extracts the scan result from the input_data object and save it to a new file
         in the file system. The name of the file is calculated using the scan id. The
-        destination path is defined by the config object.\n
+        destination path is defined by the config object.
 
-        Positional arguments:\n
-        input_data -- a dictionary including all inputs required for the action.\n
+        Positional arguments:
+            input_data -- a dictionary including all inputs required for the action.
 
-        Return value:\n
-        a dictionary including the action's output and all previous inputs.
+        Return value:
+            a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running SaveScanResult action')
         self.save_scan_result(self.create_filename(input_data), input_data[CMD_STDOUT])
@@ -308,11 +309,11 @@ class SaveScanResult(Action):
     def create_filename(self, input_data):
         """Create a file name and return it as a string.
 
-        Positional arguments:\n
-        input_data -- a dictionary including scanid value.
+        Positional arguments:
+            input_data -- a dictionary including scanid value.
 
-        Return value:\n
-        a string representing the file name.
+        Return value:
+            a string representing the file name.
         """
         self.logger.debug('Creating filename using scan id')
         scan_id = input_data[SCAN_ID]
@@ -323,9 +324,9 @@ class SaveScanResult(Action):
     def save_scan_result(self, filename, result):
         """Use a helper class to create the file and save the scan result.
         
-        Positional arguments:\n
-        filename -- a string representing the file path.\n
-        result   -- a set of strings to be saved in the file.\n
+        Positional arguments:
+            filename -- a string representing the file path.
+            result   -- a set of strings to be saved in the file.
         """
         self.logger.debug('Saving scan result in a new file')
         FileHelper.write_lines(filename, result)
@@ -340,11 +341,11 @@ class PrintStdout(Action):
     def execute(self, input_data):
         """Extracts the content from input_data dictionary and print it in the stdout.
 
-        Positional arguments:\n
-        input_data -- a dictionary including all inputs required for the action.\n
+        Positional arguments:
+            input_data -- a dictionary including all inputs required for the action.
 
-        Return value:\n
-        a dictionary including the action's output and all previous inputs.
+        Return value:
+            a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running PrintStdout action')
         stdout_input = input_data[STDOUT_INPUT]

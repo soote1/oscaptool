@@ -24,6 +24,35 @@ COMMAND = 'command'
 CMD_STDOUT = 'cmd_stdout'
 STDOUT_INPUT = 'stdout_input'
 
+class Rule:
+    """A class to represent a rule evaluation result."""
+    def __init__(self, title, rule, result):
+        """Initialize rule properties."""
+        self._title = title
+        self._rule = rule
+        self._result = result
+    
+    def __repr__(self):
+        """Create a string representation of rule values."""
+        return f'Title: {self._title}\nRule: {self._rule}\nResult: {self._result}\n\n'
+
+class ScanResult:
+    """A class to represent a scan result."""
+    def __init__(self, rules, stats):
+        """Initialize scan result properties."""
+        self._rules = rules
+        self._stats = stats
+
+    def __repr__(self):
+        """Create a string representation of scan result values."""
+        result = ''
+        for rule in self._rules:
+            result += str(rule)
+        
+        result += '---- Stats ----\n\n'
+        result += str(self._stats)
+        return result
+
 class ScanStats:
     """A class to represent scan result stats"""
     def __init__(self, pass_count, fail_count, na_count, total):
@@ -43,6 +72,7 @@ class ScanResultComparison:
         self._diff = diff
 
     def __repr__(self):
+        """Create a string representation of a scan result comparison."""
         return f'scan1: {self._scan1}\nscan2: {self._scan2}\ndiff: {self._diff}'
 
 class CreateScanId(Action):
@@ -156,9 +186,41 @@ class GetScanResult(Action):
         except Exception:
             raise ActionError('Missing input: scan_id')
 
-        input_data[self.config[OUTPUT_KEY_NAME]] = self.get_scan_result(scan_id)
+        scan_result = self.get_scan_result(scan_id)
+        input_data[self.config[OUTPUT_KEY_NAME]] = scan_result
         input_data[NEXT_ACTION] = self.config[NEXT_ACTION]
         return input_data
+    
+    def parse_result(self, scan_result_str):
+        """Create a list of Result objects from scan result string."""
+        state = 'find_title'
+        title = None
+        rule = None
+        result = None
+        rules = []
+
+        for line in scan_result_str.split('\n'):
+            if state == 'find_title':
+                if line == 'Title':
+                    state = 'grab_title'
+            elif state == 'grab_title':
+                title = line
+                state = 'find_rule'
+            elif state == 'find_rule':
+                if line == 'Rule':
+                    state = 'grab_rule'
+            elif state == 'grab_rule':
+                rule = line
+                state = 'find_result'
+            elif state == 'find_result':
+                if line == 'Result':
+                    state = 'grab_result'
+            elif state == 'grab_result':
+                result = line
+                rules.append(Rule(title.strip(), rule.strip(), result.strip()))
+                state = 'find_title'
+
+        return rules
 
     def get_scan_result(self, scan_id):
         """Creates a file path using a given scan id and a path from the action's config.
@@ -172,7 +234,27 @@ class GetScanResult(Action):
         """
         self.logger.debug('Fetching scan result from file system')
         file_name = f"{self.config[PATH]}{scan_id}.txt"
-        return FileHelper.read(file_name)
+        scan_result_str = FileHelper.read(file_name)
+        rules = self.parse_result(scan_result_str)
+        scan_stats = self.get_scan_stats(scan_result_str)
+        return ScanResult(rules, scan_stats)
+
+    def get_scan_stats(self, scan_result_str):
+        """Uses a regular expression to extract all instances of a word (pass, fail, notapplicable)
+        in a string, then counts the repetitions of each word and returns an object with the results.
+
+        Positional arguments:
+            scan_result_str -- a string representing a scan result
+
+        Return value:
+            a dictionary including the counts for each word.
+        """
+        self.logger.debug('Creating stats object for scan result')
+        pass_count = len(re.findall(PASS_SCAN_RESULT, scan_result_str))
+        fail_count = len(re.findall(FAIL_SCAN_RESULT, scan_result_str))
+        na_count = len(re.findall(NA_SCAN_RESULT, scan_result_str))
+        total_count = pass_count + fail_count + na_count
+        return ScanStats(pass_count, fail_count, na_count, total_count)
 
 class GetScanHistory(Action):
     """A class to retrieve scan history from the file system."""
@@ -355,7 +437,7 @@ class PrintStdout(Action):
             for line in stdout_input:
                 print(line)
         else:
-            raise ActionError('Invalid format for stdout_input input value')
+            print(str(stdout_input))
 
         input_data[NEXT_ACTION] = self.config[NEXT_ACTION]
         return input_data

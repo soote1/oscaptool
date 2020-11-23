@@ -19,7 +19,7 @@ The CLI provides the following features:
 * Execute a scan and print the scan result in the output.
 * List history of executed scans printing scan ids.
 * Print a scan result by any scan id available from the history.
-* Compare two scan results available from the history by scan ids. (id/total/passed/failed)
+* Compare two scan results available from the history by scan ids. (id/total/passed/failed/fixed/introduced)
 
 Design
 ------
@@ -67,7 +67,7 @@ Testing
 Unit tests are under development. Meanwhile, you can run the following commands to exercise the features:  
 * Perform basic scan
 ```bash
-oscaptool scan xccdf 1 stig /tmp/ssg-results.xml /usr/share/xml/scap/ssg/content/ssg-ol7-cpe-dictionary.xml /usr/share/xml/scap/ssg/content/ssg-ol7-xccdf.xml
+oscaptool scan xccdf 1 --results /tmp/ssg-results.xml --cpe-dict /usr/share/xml/scap/ssg/content/ssg-ol7-cpe-dictionary.xml --scap-xccdf /usr/share/xml/scap/ssg/content/ssg-ol7-xccdf.xml
 ```
 * Show scan history
 ```bash

@@ -34,12 +34,18 @@
                         "help": "Evaluate all definitions within the given OVAL Definition file",
                         "args": [
                           {
-                            "type": "pos",
-                            "id": "oval-results"
+                            "id": "--results",
+                            "kwargs":{
+                              "required": true,
+                              "help": "The OVAL Result file"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "scap-oval"
+                            "id": "--scap-oval",
+                            "kwargs":{
+                              "required": true,
+                              "help": "The OVAL Definition file"
+                            }
                           }
                         ]
                       },
@@ -48,16 +54,25 @@
                         "help": "Evaluate one particular definition within the given OVAL Definition file",
                         "args": [
                           {
-                            "type": "pos",
-                            "id": "definition-id"
+                            "id": "--definition-id",
+                            "kwargs":{
+                              "required": true,
+                              "help": "The OVAL definition being evaluated"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "oval-results"
+                            "id": "--results",
+                            "kwargs":{
+                              "required": true,
+                              "help": "The OVAL Result file"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "scap-oval"
+                            "id": "--scap-oval",
+                            "kwargs":{
+                              "required": true,
+                              "help": "The OVAL Definition file"
+                            }
                           }
                         ]
                       },
@@ -66,20 +81,32 @@
                         "help":"Evaluate all definitions from the OVAL component that are part of a particular data stream within a SCAP data stream collection",
                         "args": [
                           {
-                            "type": "pos",
-                            "id": "datastream-id"
+                            "id": "--ds-id",
+                            "kwargs":{
+                              "required": true,
+                              "help": "The given data stream"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "oval-id"
+                            "id": "--oval-id",
+                            "kwargs":{
+                              "required": true,
+                              "help": "An XCCDF file specifying the OVAL component"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "oval-results"
+                            "id": "--results",
+                            "kwargs":{
+                              "required": true,
+                              "help": "The OVAL Result file"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "scap-ds"
+                            "id": "--scap-ds",
+                            "kwargs":{
+                              "required": true,
+                              "help": "A file representing the SCAP data stream collection"
+                            }
                           }
                         ]
                       }
@@ -96,23 +123,35 @@
                     "subparsers_cfgs": [
                       {
                         "name": "1",
-                        "help": "evaluate a specific profile in an XCCDF file",
+                        "help": "Evaluate a specific profile in an XCCDF file",
                         "args": [
                           {
-                            "type": "pos",
-                            "id": "profile"
+                            "id": "--profile",
+                            "kwargs":{
+                              "default":"stig",
+                              "help":"The selected profile from the XCCDF document (stig default)"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "results"
+                            "id": "--results",
+                            "kwargs":{
+                              "required": true,
+                              "help":"A file storing the scan results"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "cpe-dict"
+                            "id": "--cpe-dict",
+                            "kwargs":{
+                              "required": true,
+                              "help": "The path to the CPE dictionary"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "scap-xccdf"
+                            "id": "--scap-xccdf",
+                            "kwargs":{
+                              "required": true,
+                              "help": "The XCCDF document"
+                            }
                           }
                         ]
                       },
@@ -121,24 +160,39 @@
                         "help": "Evaluate a specific XCCDF rule",
                         "args": [
                           {
-                            "type": "pos",
-                            "id": "profile"
+                            "id": "--rule",
+                            "kwargs": {
+                              "required": true,
+                              "help": "The rule from the profile which will be evaluated"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "rule"
+                            "id": "--profile",
+                            "kwargs":{
+                              "default":"stig",
+                              "help":"The selected profile from the XCCDF document (stig default)"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "results"
+                            "id": "--results",
+                            "kwargs":{
+                              "required": true,
+                              "help":"A file storing the scan results"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "cpe-dict"
+                            "id": "--cpe-dict",
+                            "kwargs":{
+                              "required": true,
+                              "help": "The path to the CPE dictionary"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "scap-xccdf"
+                            "id": "--scap-xccdf",
+                            "kwargs":{
+                              "required": true,
+                              "help": "The XCCDF document"
+                            }
                           }
                         ]
                       }
@@ -158,20 +212,32 @@
                         "help": "Evaluate a specific XCCDF benchmark that is part of a DataStream within a SCAP DataStream collection",
                         "args": [
                           {
-                            "type": "pos",
-                            "id": "datastream-id"
+                            "id": "--ds-id",
+                            "kwargs":{
+                              "required": true,
+                              "help": "The particular DataStream"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "xccdf-id"
+                            "id": "--xccdf-id",
+                            "kwargs":{
+                              "required": true,
+                              "help": "The ID of the component-ref pointing to the desired XCCDF document"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "results"
+                            "id": "--results",
+                            "kwargs":{
+                              "required": true,
+                              "help": "A file containing the scan results"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "scap-ds"
+                            "id": "--scap-ds",
+                            "kwargs":{
+                              "required": true,
+                              "help": "A file representing the SCAP DataStream collection"
+                            }
                           }
                         ]
                       },
@@ -180,16 +246,25 @@
                         "help": "Evaluate a specific XCCDF benchmark that is part of a DataStream within a SCAP DataStream collection",
                         "args": [
                           {
-                            "type": "pos",
-                            "id": "benchmark-id"
+                            "id": "--benchmark-id",
+                            "kwargs":{
+                              "required": true,
+                              "help": "A string matching the id attribute of xccdf:Benchmark containing in a component"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "results"
+                            "id": "--results",
+                            "kwargs":{
+                              "required": true,
+                              "help": "A file containing the scan results"
+                            }
                           },
                           {
-                            "type": "pos",
-                            "id": "scap-ds"
+                            "id": "--scap-ds",
+                            "kwargs":{
+                              "required": true,
+                              "help": "A file representing the SCAP DataStream collection"
+                            }
                           }
                         ]
                       }
@@ -204,9 +279,10 @@
             "help": "Show scans from scan history",
             "args": [
               {
-                "type": "opt",
                 "id": "--scan-id",
-                "id2": "--sid"
+                "kwargs":{
+                  "help": "A scan result's file name"
+                }
               }
             ]
           },
@@ -215,12 +291,16 @@
             "help": "Compare two scan results and show statistics",
             "args": [
               {
-                "type": "pos",
-                "id": "scan-id-1"
+                "id": "scan-id-1",
+                "kwargs":{
+                  "help": "A scan result's file name"
+                }
               },
               {
-                "type": "pos",
-                "id": "scan-id-2"
+                "id": "scan-id-2",
+                "kwargs":{
+                  "help": "A scan result's file name"
+                }
               }
             ]
           }
@@ -237,8 +317,8 @@
           "build_command": {"module":"oscaptool.sample.actions", "class":"BuildCommand", "config":{
             "command":"oscap oval eval",
             "mappings":{
-              "oval-results":"--results",
-              "scap-oval":""
+              "results":"--results",
+              "scap_oval":""
             },
             "next_action":"execute_command"
           }},
@@ -255,9 +335,9 @@
           "build_command": {"module":"oscaptool.sample.actions", "class":"BuildCommand", "config":{
             "command":"oscap oval eval",
             "mappings":{
-              "definition-id":"--id",
-              "oval-results":"--results",
-              "scap-oval":""
+              "definition_id":"--id",
+              "results":"--results",
+              "scap_oval":""
             },
             "next_action":"execute_command"
           }},
@@ -274,10 +354,10 @@
           "build_command": {"module":"oscaptool.sample.actions", "class":"BuildCommand", "config":{
             "command":"oscap oval eval",
             "mappings":{
-              "datastream-id":"--datastream-id",
-              "oval-id":"--oval-id",
-              "oval-results":"--results",
-              "scap-ds":""
+              "ds_id":"--datastream-id",
+              "oval_id":"--oval-id",
+              "results":"--results",
+              "scap_ds":""
             },
             "next_action":"execute_command"
           }},
@@ -295,9 +375,9 @@
             "command":"oscap xccdf eval",
             "mappings":{
               "profile":"--profile",
-              "cpe-dict":"--cpe",
+              "cpe_dict":"--cpe",
               "results":"--results",
-              "scap-xccdf":""
+              "scap_xccdf":""
             },
             "next_action":"execute_command"
           }},
@@ -316,9 +396,9 @@
             "mappings":{
               "rule":"--rule",
               "profile":"--profile",
-              "cpe-dict":"--cpe",
+              "cpe_dict":"--cpe",
               "results":"--results",
-              "scap-xccdf":""
+              "scap_xccdf":""
             },
             "next_action":"execute_command"
           }},
@@ -335,10 +415,10 @@
           "build_command": {"module":"oscaptool.sample.actions", "class":"BuildCommand", "config":{
             "command":"oscap xccdf eval",
             "mappings":{
-              "datastream-id":"--datastream-id",
-              "xccdf-id":"--xccdf-id",
+              "ds_id":"--datastream-id",
+              "xccdf_id":"--xccdf-id",
               "results":"--results",
-              "scap-ds":""
+              "scap_ds":""
             },
             "next_action":"execute_command"
           }},
@@ -355,9 +435,9 @@
           "build_command": {"module":"oscaptool.sample.actions", "class":"BuildCommand", "config":{
             "command":"oscap xccdf eval",
             "mappings":{
-              "benchmark-id":"--benchmark-id",
+              "benchmark_id":"--benchmark-id",
               "results":"--results",
-              "scap-ds":""
+              "scap_ds":""
             },
             "next_action":"execute_command"
           }},

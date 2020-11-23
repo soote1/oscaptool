@@ -2,6 +2,7 @@ import re
 import time
 import logging
 import subprocess
+import datetime
 
 from oscaptool.sample.util import FileHelper
 from actionmanager.actions import Action, ActionError
@@ -94,10 +95,10 @@ class CreateScanId(Action):
             a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running CreateScanId action')
-        current_timestamp = int(time.time())
+        current_datetime = datetime.datetime.utcfromtimestamp(int(time.time())).strftime('%Y-%m-%d_%H:%M:%S')
         scan_type = input_data[SCAN_TYPE]
         scan_subtype = input_data[SCAN_SUB_TYPE]
-        input_data[SCAN_ID] = f'{current_timestamp}_{scan_type}_{scan_subtype}'
+        input_data[SCAN_ID] = f'{current_datetime}_{scan_type}_{scan_subtype}'
         input_data[NEXT_ACTION] = self.config[NEXT_ACTION]
         return input_data
 

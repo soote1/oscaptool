@@ -127,7 +127,14 @@ class CompareScanResults(Action):
 
     def calculate_fixed_introduced_results_diff(self, oldest_scan, newest_scan):
         """Count how many 'fail' results from oldest scan are fixed in newest scan and how
-        many 'pass' results are failing now.
+        many 'pass' results are failing.
+
+        Positional arguments:
+            oldest_scan -- an instance of ScanResult class representing the previous scan
+            newest_scan -- an instance of ScanResult class representing tha last scan
+
+        Return value:
+            An instance of ScanResultComparison class including each scan and fixed/introduced 
         """
         self.logger.debug('Calculating fixed/introduced results diff between scans')
         fixed_count = 0

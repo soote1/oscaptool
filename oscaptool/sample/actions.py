@@ -61,19 +61,20 @@ class ScanStats:
         self.na_count = na_count
         self.total = total
     
-    def __repr__(self):
+    def __str__(self):
         return f'total: {self.total} pass: {self.pass_count} fail: {self.fail_count} notapplicable: {self.na_count}'
 
 class ScanResultComparison:
     """A class to represent a comparison between two scan results"""
-    def __init__(self, scan1, scan2, diff):
+    def __init__(self, scan1, scan2, introduced, fixed):
         self._scan1 = scan1
         self._scan2 = scan2
-        self._diff = diff
+        self._introduced = introduced
+        self._fixed = fixed
 
     def __repr__(self):
         """Create a string representation of a scan result comparison."""
-        return f'scan1: {self._scan1}\nscan2: {self._scan2}\ndiff: {self._diff}'
+        return f'scan1: {self._scan1._stats}\nscan2: {self._scan2._stats}\nintroduced: {self._introduced}\nfixed: {self._fixed}'
 
 class CreateScanId(Action):
     """A class to create the scan id."""
@@ -108,9 +109,8 @@ class CompareScanResults(Action):
         self.logger = logging.getLogger()
 
     def execute(self, input_data):
-        """Calculates stats (total, pass, fail and notapplicable results)
-        for each scan result, then calculates the diff between both stats. Adds the
-        final result to the input_values dictionary.
+        """Retrieve two scan results from the input_data dict and calculate the number of
+        fixed/introduced results diff between both scans.
 
         Positional arguments:
             input_data -- a dictionary including all inputs required for the action.
@@ -119,48 +119,34 @@ class CompareScanResults(Action):
             a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running CompareScanResults action')
-        scan_stats_1 = self.get_scan_stats(input_data[self.config[SCAN_RESULT_1_KEY_NAME]])
-        scan_stats_2 = self.get_scan_stats(input_data[self.config[SCAN_RESULT_2_KEY_NAME]])
-        diff_stats = self.diff_stats(scan_stats_1, scan_stats_2)
-
-        input_data[self.config[OUTPUT_KEY_NAME]] = str(ScanResultComparison(scan_stats_1, scan_stats_2, diff_stats))
+        scan_result_1 = input_data[self.config[SCAN_RESULT_1_KEY_NAME]]
+        scan_result_2 = input_data[self.config[SCAN_RESULT_2_KEY_NAME]]
+        input_data[self.config[OUTPUT_KEY_NAME]] = self.calculate_fixed_introduced_results_diff(scan_result_1, scan_result_2)
         input_data[NEXT_ACTION] = self.config[NEXT_ACTION]
         return input_data
-     
-    def get_scan_stats(self, scan_result_str):
-        """Uses a regular expression to extract all instances of a word (pass, fail, notapplicable)
-        in a string, then counts the repetitions of each word and returns an object with the results.
 
-        Positional arguments:
-            scan_result_str -- a string representing a scan result
-
-        Return value:
-            a dictionary including the counts for each word.
+    def calculate_fixed_introduced_results_diff(self, oldest_scan, newest_scan):
+        """Count how many 'fail' results from oldest scan are fixed in newest scan and how
+        many 'pass' results are failing now.
         """
-        self.logger.debug('Creating stats object for scan result')
-        pass_count = len(re.findall(PASS_SCAN_RESULT, scan_result_str))
-        fail_count = len(re.findall(FAIL_SCAN_RESULT, scan_result_str))
-        na_count = len(re.findall(NA_SCAN_RESULT, scan_result_str))
-        total_count = pass_count + fail_count + na_count
-        return ScanStats(pass_count, fail_count, na_count, total_count)
-
-    def diff_stats(self, stats1, stats2):
-        """Calculates the absolute difference between each stats object 
-        and returns a new object with the results.
-
-        Positional arguments:
-            stats1 -- a dictionary including the counts for each result type
-            stats2 -- a dictionary including the counts for each result type
-
-        Return value:
-            a dictionary including the diff between stats.
-        """
-        self.logger.debug('Creating diff object using scan result objects')
-        pass_diff = abs(stats1.pass_count-stats2.pass_count)
-        fail_diff = abs(stats1.fail_count-stats2.fail_count)
-        na_diff = abs(stats1.na_count-stats2.na_count)
-        total_diff = pass_diff + fail_diff + na_diff
-        return ScanStats(pass_diff, fail_diff, na_diff, total_diff)
+        self.logger.debug('Calculating fixed/introduced results diff between scans')
+        fixed_count = 0
+        introduced_count = 0
+        newest_scan_rules_result = {rule._rule: rule._result for rule in newest_scan._rules}
+        for rule in oldest_scan._rules:
+            if rule._result == 'pass':
+                try:
+                    if newest_scan_rules_result[rule._rule] == 'fail':
+                        introduced_count += 1
+                except:
+                    pass
+            elif rule._result == 'fail':
+                try:
+                    if newest_scan_rules_result[rule._rule] == 'pass':
+                        fixed_count += 1
+                except:
+                    fixed_count += 1
+        return ScanResultComparison(oldest_scan, newest_scan, introduced_count, fixed_count)
 
 class GetScanResult(Action):
     """A class to retrieve a scan result from the file system."""
@@ -186,8 +172,7 @@ class GetScanResult(Action):
         except Exception:
             raise ActionError('Missing input: scan_id')
 
-        scan_result = self.get_scan_result(scan_id)
-        input_data[self.config[OUTPUT_KEY_NAME]] = scan_result
+        input_data[self.config[OUTPUT_KEY_NAME]] = self.get_scan_result(scan_id)
         input_data[NEXT_ACTION] = self.config[NEXT_ACTION]
         return input_data
     

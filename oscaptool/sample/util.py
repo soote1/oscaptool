@@ -9,10 +9,8 @@ SUBPARSERS_CFGS = 'subparsers_cfgs'
 NAME = 'name'
 HELP = 'help'
 ARGS = 'args'
-TYPE = 'type'
-OPT = 'opt'
-ID2 = 'id2'
 WRITE_MODE = 'w'
+KWARGS = 'kwargs'
  
 class ArgsParser:
     """A helper class to validate arguments."""
@@ -44,13 +42,10 @@ class ArgsParser:
 
             # load arguments for subparser
             for arg in subparser_config[ARGS]:
-                if arg[TYPE] == OPT:
-                    arg_id = arg[ID]
-                    arg_id2 = arg[ID2]
-                    subparser.add_argument(arg_id, arg_id2)
+                if KWARGS in arg:
+                    subparser.add_argument(arg[ID], **arg[KWARGS])
                 else:
-                    arg_id = arg[ID]
-                    subparser.add_argument(arg_id)
+                    subparser.add_argument(arg[ID])
 
             if SUBPARSERS in subparser_config:
                 self.load_subparsers(subparser_config[SUBPARSERS], subparser)

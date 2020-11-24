@@ -83,6 +83,22 @@ class CreateScanId(Action):
         """Initialize action with a given configuration dictionary."""
         self.config = config
         self.logger = logging.getLogger()
+        self.validate_config()
+
+    def validate_config(self):
+        """Verify that required config values are present in config dict."""
+        try:
+            self.config[NEXT_ACTION]
+        except KeyError as e:
+            raise ActionError(f'Action error: missing required setting {e}')
+
+    def validate_input_values(self, input_data):
+        """Verify that required input values are present in input_data dict."""
+        try:
+            input_data[SCAN_TYPE]
+            input_data[SCAN_SUB_TYPE]
+        except KeyError as e:
+            raise ActionError(f'Action error: missing required input value {e}')
 
     def execute(self, input_data):
         """Creates a unique scan id using the current timestamp, scan type
@@ -95,7 +111,9 @@ class CreateScanId(Action):
             a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running CreateScanId action')
+        self.validate_input_values(input_data)
         current_datetime = datetime.datetime.utcfromtimestamp(int(time.time())).strftime('%Y-%m-%d_%H:%M:%S')
+
         scan_type = input_data[SCAN_TYPE]
         scan_subtype = input_data[SCAN_SUB_TYPE]
         input_data[SCAN_ID] = f'{current_datetime}_{scan_type}_{scan_subtype}'
@@ -108,6 +126,25 @@ class CompareScanResults(Action):
         """Initialize action with a given configuration dictionary."""
         self.config = config
         self.logger = logging.getLogger()
+        self.validate_config()
+
+    def validate_config(self):
+        """Verify that required config values are present in config dict."""
+        try:
+            self.config[NEXT_ACTION]
+            self.config[SCAN_RESULT_1_KEY_NAME]
+            self.config[SCAN_RESULT_2_KEY_NAME]
+            self.config[OUTPUT_KEY_NAME]
+        except KeyError as e:
+            raise ActionError(f'Invalid action config: missing required setting {e}')
+    
+    def validate_input_values(self, input_data):
+        """Verify that required input values are present in input_data dict."""
+        try:
+            input_data[self.config[SCAN_RESULT_1_KEY_NAME]]
+            input_data[self.config[SCAN_RESULT_2_KEY_NAME]]
+        except KeyError as e:
+            raise ActionError(f'Action error: missing required input value {e}')
 
     def execute(self, input_data):
         """Retrieve two scan results from the input_data dict and calculate the number of
@@ -120,6 +157,7 @@ class CompareScanResults(Action):
             a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running CompareScanResults action')
+        self.validate_input_values(input_data)
         scan_result_1 = input_data[self.config[SCAN_RESULT_1_KEY_NAME]]
         scan_result_2 = input_data[self.config[SCAN_RESULT_2_KEY_NAME]]
         input_data[self.config[OUTPUT_KEY_NAME]] = self.calculate_fixed_introduced_results_diff(scan_result_1, scan_result_2)
@@ -162,6 +200,24 @@ class GetScanResult(Action):
         """Initialize the action with the given config."""
         self.config = config
         self.logger = logging.getLogger()
+        self.validate_config()
+
+    def validate_config(self):
+        """Verify that required config values are present in config dict."""
+        try:
+            self.config[NEXT_ACTION]
+            self.config[SCAN_ID_KEY_NAME]
+            self.config[OUTPUT_KEY_NAME]
+            self.config[PATH]
+        except KeyError as e:
+            raise ActionError(f'Invalid action config: missing required setting {e}')
+
+    def validate_input_values(self, input_data):
+        """Verify that required input values are present in input_data dict."""
+        try:
+            input_data[self.config[SCAN_ID_KEY_NAME]]
+        except KeyError as e:
+            raise ActionError(f'Action error: missing required input value {e}')
 
     def execute(self, input_data):
         """Extracts the scan id from the input_data object and uses a helper class
@@ -175,12 +231,8 @@ class GetScanResult(Action):
             a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running GetScanResult action')
-        try:
-            scan_id = input_data[self.config[SCAN_ID_KEY_NAME]]
-        except Exception:
-            raise ActionError('Missing input: scan_id')
-
-        input_data[self.config[OUTPUT_KEY_NAME]] = self.get_scan_result(scan_id)
+        self.validate_input_values(input_data)
+        input_data[self.config[OUTPUT_KEY_NAME]] = self.get_scan_result(input_data[self.config[SCAN_ID_KEY_NAME]])
         input_data[NEXT_ACTION] = self.config[NEXT_ACTION]
         return input_data
     
@@ -227,7 +279,11 @@ class GetScanResult(Action):
         """
         self.logger.debug('Fetching scan result from file system')
         file_name = f"{self.config[PATH]}{scan_id}.txt"
-        scan_result_str = FileHelper.read(file_name)
+        try:
+            scan_result_str = FileHelper.read(file_name)
+        except:
+            raise ActionError(f"Action error: can't retrieve content from {file_name}")
+
         rules = self.parse_result(scan_result_str)
         scan_stats = self.get_scan_stats(scan_result_str)
         return ScanResult(rules, scan_stats)
@@ -255,6 +311,16 @@ class GetScanHistory(Action):
         """Initialize the action with a given configuration dictionary."""
         self.config = config
         self.logger = logging.getLogger()
+        self.validate_config()
+
+    def validate_config(self):
+        """Verify that required config values are present in config dict."""
+        try:
+            self.config[NEXT_ACTION]
+            self.config[OUTPUT_KEY_NAME]
+            self.config[PATH]
+        except KeyError as e:
+            raise ActionError(f'Invalid action config: missing required setting {e}')
     
     def execute(self, input_data):
         """Retrieves the scan history from the file system and adds all the
@@ -279,7 +345,10 @@ class GetScanHistory(Action):
             a list of strings representing each file in the path.
         """
         self.logger.debug('Fetching file names from directory')
-        return FileHelper.get_files_from_dir(self.config[PATH])
+        try:
+            return FileHelper.get_files_from_dir(self.config[PATH])
+        except:
+            raise ActionError(f"Action error: can't retrieve content from {self.config[PATH]}")
 
 
 class BuildCommand(Action):
@@ -288,6 +357,16 @@ class BuildCommand(Action):
         """Initialize the action with a given configuration dictionary."""
         self.config = config
         self.logger = logging.getLogger()
+        self.validate_config()
+
+    def validate_config(self):
+        """Verify that required config values are present in config dict."""
+        try:
+            self.config[NEXT_ACTION]
+            self.config[MAPPINGS]
+            self.config[COMMAND]
+        except KeyError as e:
+            raise ActionError(f'Invalid action config: missing required setting {e}')
 
     def execute(self, input_data):
         """Creates a command using a mappings dictionary from the action's config
@@ -303,15 +382,18 @@ class BuildCommand(Action):
         self.logger.debug('Running BuildCommand action')
         optional_args = []
         positional_args = []
-        for key, val in self.config[MAPPINGS].items():
-            # get the value from inputs
-            arg_val = input_data[key]
-            if val:
-                # optional argument
-                optional_args.append(f'{val} {arg_val}')
-            else:
-                # positional argument
-                positional_args.append(arg_val)
+        try:
+            for key, val in self.config[MAPPINGS].items():
+                # get the value from inputs
+                arg_val = input_data[key]
+                if val:
+                    # optional argument
+                    optional_args.append(f'{val} {arg_val}')
+                else:
+                    # positional argument
+                    positional_args.append(arg_val)
+        except KeyError as e:
+            raise ActionError(f'Action error: missing value for {e} key in mappings dict')
         input_data[CMD_STR] = f"{self.config[COMMAND]} {' '.join(optional_args)} {' '.join(positional_args)}"
         input_data[NEXT_ACTION] = self.config[NEXT_ACTION]
         return input_data
@@ -322,6 +404,21 @@ class ExecuteCommand(Action):
         """Initialize the action with a given configuration dictionary."""
         self.config = config
         self.logger = logging.getLogger()
+        self.validate_config()
+
+    def validate_config(self):
+        """Verify that required config values are present in config dict."""
+        try:
+            self.config[NEXT_ACTION]
+        except KeyError as e:
+            raise ActionError(f'Action error: missing required setting {e}')
+    
+    def validate_input_values(self, input_data):
+        """Verify that required input values are present in input_data dict."""
+        try:
+            input_data[CMD_STR]
+        except KeyError as e:
+            raise ActionError(f'Action error: missing required input value {e}')
 
     def execute(self, input_data):
         """Extracts the command to execute from the input_data dictionary,
@@ -335,6 +432,7 @@ class ExecuteCommand(Action):
             a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running ExecuteCommand action')
+        self.validate_input_values(input_data)
         cmd_stdout = []
         for line in self.run_command(input_data[CMD_STR].split()):
             decoded_line = line.decode('utf-8')
@@ -364,6 +462,23 @@ class SaveScanResult(Action):
         """Initialize action with a given configuration dictionary."""
         self.config = config
         self.logger = logging.getLogger()
+        self.validate_config()
+
+    def validate_config(self):
+        """Verify that required config values are present in config dict."""
+        try:
+            self.config[NEXT_ACTION]
+            self.config[PATH]
+        except KeyError as e:
+            raise ActionError(f'Action error: missing required setting {e}')
+    
+    def validate_input_values(self, input_data):
+        """Verify that required input values are present in input_data dict."""
+        try:
+            input_data[SCAN_ID]
+            input_data[CMD_STDOUT]
+        except KeyError as e:
+            raise ActionError(f'Action error: missing required input value {e}')
 
     def execute(self, input_data):
         """Extracts the scan result from the input_data object and save it to a new file
@@ -377,6 +492,7 @@ class SaveScanResult(Action):
             a dictionary including the action's output and all previous inputs.
         """
         self.logger.debug('Running SaveScanResult action')
+        self.validate_input_values(input_data)
         self.save_scan_result(self.create_filename(input_data), input_data[CMD_STDOUT])
         input_data[NEXT_ACTION] = self.config[NEXT_ACTION]
         return input_data
@@ -404,7 +520,10 @@ class SaveScanResult(Action):
             result   -- a set of strings to be saved in the file.
         """
         self.logger.debug('Saving scan result in a new file')
-        FileHelper.write_lines(filename, result)
+        try:
+            FileHelper.write_lines(filename, result)
+        except:
+            raise ActionError(f"Action error: can't write content in {filename}")
 
 class PrintStdout(Action):
     """An action to print content in the stdout."""
@@ -412,6 +531,21 @@ class PrintStdout(Action):
         """Initialize the action with a given configuration dictionary."""
         self.config = config
         self.logger = logging.getLogger()
+        self.validate_config()
+
+    def validate_config(self):
+        """Verify that required config values are present in config dict."""
+        try:
+            self.config[NEXT_ACTION]
+        except KeyError as e:
+            raise ActionError(f'Action error: missing required setting {e}')
+    
+    def validate_input_values(self, input_data):
+        """Verify that required input values are present in input_data dict."""
+        try:
+            input_data[STDOUT_INPUT]
+        except KeyError as e:
+            raise ActionError(f'Action error: missing required input value {e}')
 
     def execute(self, input_data):
         """Extracts the content from input_data dictionary and print it in the stdout.

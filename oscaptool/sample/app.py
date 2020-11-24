@@ -35,8 +35,10 @@ class Client:
             self._args_parser = ArgsParser(self.config[ARGPARSER])
             self._action_manager = ActionManager(self.config[ACTIONMANAGER])
         except:
+            print('Critical error occurred while trying to initialize objects')
+            print('See logs for details')
             self.logger.critical('Critical error while trying to initialize objects', exc_info=1)
-            raise
+            sys.exit(1)
 
     def run(self):
         """Run parsing arguments and execute workflow processes."""
@@ -53,9 +55,12 @@ class Client:
         try:
             self.logger.debug('Interpreting parsed args')
             self._action_manager.run_workflow(self.build_workflow_metadata(parsed_args))
-        except:
-            self.logger.critical('Critical error while trying to run workflow', exc_info=1)
-            raise
+        except Exception as e:
+            print('An unexpected error ocurred while executing workflow:')
+            print(e)
+            print('See logs for details')
+            self.logger.critical('Critical error occurred while trying to run workflow', exc_info=1)
+            sys.exit(1)
 
     def build_workflow_metadata(self, parsed_args):
         """Creates a WorkflowMetadata object from a set of parsed args."""
@@ -63,16 +68,22 @@ class Client:
 
         workflow_id_keys = {ACTION}
         workflow_id = ''
-        if parsed_args[ACTION] == SCAN:
-            workflow_id_keys.add(SCAN_TYPE)
-            workflow_id_keys.add(SCAN_SUB_TYPE)
-            scan_type = parsed_args[SCAN_TYPE]
-            scan_subtype = parsed_args[SCAN_SUB_TYPE]
-            workflow_id = f"{parsed_args[ACTION]}-{scan_type}-{scan_subtype}"
-        elif parsed_args[ACTION] == SHOW:
-            workflow_id = SHOW_SCAN_RESULT if parsed_args[SCAN_ID] else SHOW_SCAN_HISTORY
-        elif parsed_args[ACTION] == COMP:
-            workflow_id = COMP_SCAN_RESULTS
+        try:
+            if parsed_args[ACTION] == SCAN:
+                workflow_id_keys.add(SCAN_TYPE)
+                workflow_id_keys.add(SCAN_SUB_TYPE)
+                scan_type = parsed_args[SCAN_TYPE]
+                scan_subtype = parsed_args[SCAN_SUB_TYPE]
+                workflow_id = f"{parsed_args[ACTION]}-{scan_type}-{scan_subtype}"
+            elif parsed_args[ACTION] == SHOW:
+                workflow_id = SHOW_SCAN_RESULT if parsed_args[SCAN_ID] else SHOW_SCAN_HISTORY
+            elif parsed_args[ACTION] == COMP:
+                workflow_id = COMP_SCAN_RESULTS
+        except KeyError as e:
+            print('Critical error ocurred while trying to build workflow metadata object')
+            print(f'Key missing in parsed args dict: {e}')
+            self.logger.critical('Critical error occurred while trying to build workflow metadata object', exc_info=1)
+            sys.exit(1)
         
         return WorkflowMetadata(workflow_id, parsed_args)
 
